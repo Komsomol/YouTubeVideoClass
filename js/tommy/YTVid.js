@@ -45,20 +45,36 @@ YTVID.prototype = {
         INITIALIZER
     --------------------------------------------------*/
     add: function() {
+        if (typeof(window.YT) == 'undefined' || typeof(YT.Player) == 'undefined') {
+            var tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            var firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+            window.onYouTubePlayerAPIReady = function() {
+                this.startPlay();
+            }.bind(this);
+
+        } else {
+            this.startPlay();
+        }
+    },
+
+    startPlay:function(){
         this.player = new YT.Player(this.containerID, {
-            videoId : this.id,
-            width : this.width,
-            height : this.height,
-            allowFullScreen : true,
-            playerVars: this.playerVars,
+                videoId : this.id,
+                width : this.width,
+                height : this.height,
+                allowFullScreen : true,
+                playerVars: this.playerVars,
 
-            events: {
-                'onReady': this.onPlayerReady.bind(this),
-                'onStateChange': this.onPlayerStateChange.bind(this),
-                'onError' : this.onPLayerError.bind(this)
-            }
+                events: {
+                    'onReady': this.onPlayerReady.bind(this),
+                    'onStateChange': this.onPlayerStateChange.bind(this),
+                    'onError' : this.onPLayerError.bind(this)
+                }
 
-        });
+            });
     },
 
     /*---------------------------------------------------
@@ -147,6 +163,21 @@ YTVID.prototype = {
     }
 
 };
+
+Function.prototype.bind = function(scope) {
+    var _function = this;
+
+    return function() {
+        return _function.apply(scope, arguments);
+    };
+
+};
+
+Function.prototype.vars = function(obj) {
+
+};
+
+
 //YTAPIINJECT = function() {
 //
 //var tag = document.createElement('script');
